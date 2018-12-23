@@ -11,7 +11,7 @@ from time import time
 def notify_new_client(id,chatclient): 
     for client, client_info in chatclient.items():
         if not client == id:
-            print "sending new client to", client
+            print ("sending new client to", client)
             conn = Client(address=client_info[0], authkey=client_info[1])
             conn.send(("new client", id))
             conn.close()
@@ -19,15 +19,15 @@ def notify_new_client(id,chatclient):
 def send_to_client(id,chatclient,message): 
     for client, client_info in chatclient.items():
 	#Togliere la riga dopo per mandarlo anche a se stessi
-	    if client <> id:
+	#    if client <> id:
 	#	print client,"AAAAAAAAAAAAAA",client_info,"BBBBBBBBBBBBBBBBBBB",chatclient.items(),"CCCCCCCCCCCCCCCCCCCCCC",id
-            	print "sending messaje to clients", chatclient
+            	print ("sending messaje to clients", chatclient)
             	conn = Client(address=client_info[0], authkey=client_info[1])
             	conn.send((message, id))
 
 def notify_quit_client(id,chatclient): 
     for client, client_info in chatclient.items():
-            print "sending quit client to", chatclient
+            print ("sending quit client to", chatclient)
             conn = Client(address=client_info[0], authkey=client_info[1])
             conn.send(("quit client", id))
 
@@ -37,17 +37,18 @@ def serve_clientchat(conn, id, chatclient):
         try:
             m = conn.recv()
         except EOFError:
-            print 'connection abruptly closed by client'
+            print ('connection abruptly closed by client')
             connected = False
-        print 'received message:', m, 'from', id
+        print ('received message:', m, 'from', id)
         if m == "quit":    
             connected = False
             conn.close() 
-	elif m <> "quit":
-	    send_to_client(id,chatclient,m)
+    #elif m <> "quit":
+        else:
+	        send_to_client(id,chatclient,m)
     del chatclient[id]                       
     notify_quit_client(id, chatclient)            
-    print id, 'connection closed'
+    print (id, 'connection closed')
 
 
 def serve_client(conn,id,clientes,password,correos):
@@ -55,16 +56,16 @@ def serve_client(conn,id,clientes,password,correos):
 	    bool = True
 	    while bool:
 	    	m = conn.recv()
-	    	print 'Receive message:', m
+	    	print ('Receive message:', m)
 	    	if m[1] == ('new_user'):
-			if ((m[0])[0]) not in clientes:
-				print "nuevo usuario"
-				clientes.append(((m[0])[0]))
-		                password.append(m[0])
-				conn.send("Si")
-				print "CLIENTES:",clientes
-			elif ((m[0])[0]) in clientes:
-				conn.send("Esto usuario estaba ya registrado")
+			    if ((m[0])[0]) not in clientes:
+				    print ("nuevo usuario")
+				    clientes.append(((m[0])[0]))
+                            password.append(m[0])
+				    conn.send("Si")
+				    print "CLIENTES:",clientes
+			    elif ((m[0])[0]) in clientes:
+				    conn.send("Esto usuario estaba ya registrado")
 	    	elif m[1] == ('send'):
 		    	correos.append(((m[0])[0],m[2]))
 		        conn.send("Correo enviado")
